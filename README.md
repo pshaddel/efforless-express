@@ -28,8 +28,8 @@ module.exports.get = (req, res, next)=>{
     res.send("get method implemented!");
 }
 ```
-####2. create `route.[http method].js`: In this way you can implement your http methods in a single file:
-For example I can create a folder named `places` and I creaete a file named `route.get.js`
+####2. create `route.[http method].js`: In this way you can implement your http methods in separate files:
+For example I can create a folder named `places` and I create a file named `route.get.js`
 my route will be this :  `myBaseURL:myPort/places`
 And in order to handle requests all I need is exporting a function from this file
 `route.get.js`
