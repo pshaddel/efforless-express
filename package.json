@@ -4,5 +4,11 @@
   "description": "A way to use express in folder and files structure.",
   "main": "index.js",
   "author": "Poorshad Shaddel",
-  "license": "ISC"
+  "license": "ISC",
+  "keywords": [
+    "express",
+    "effortless-express",
+    "nodejs",
+    "simple express"
+  ]
 }
