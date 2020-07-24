@@ -43,3 +43,13 @@ module.exports = (req, res, next)=>{
 ####3. combination of 1 and 2 :
 You can use both of this methods but this packages priority is the first one. You can implement few methods in your `route.js` file and you can create other files for methods which are not in your `route.js` file.
 
+## Features
+* File base routes which supports nested foldering.
+* Routes separated by methods(`route.get.js, route.post.js, route.put.js, ...`)
+* Make your `app.js` or `server.js` clean by using folder based routes.
+
+## Philosophy
+  effortles-express philosophy is to provide a simple and clean structure for express projects by using folder base routes. In this way you can remove your routes from `app.js` and by creating folders and files you can create your desired routes. Also instead it helps you keep your files small by suggesting using second way(`route.get.js, route.post.js`)
+
+## People
+  The original author of effortless-express is [Poorshad](https://github.com/pshaddel)
