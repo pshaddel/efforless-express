@@ -1,9 +1,10 @@
 # Effotless express
-As far as I'm concenrned when we use `express` in our nodejs app we need to put our routes in a file which some people name it `app.js` or `server.js` and my problem was handling a lot of routes in this file. I decided to create an `express middleware` to organize routes based on folders structure of my application.
+When we use `express` in our nodejs app we need to put our routes in a file which some people name it `app.js` or `server.js` and this simple package solves the problem of handling a lot of routes in `app.js` file. I decided to create an `express middleware` to organize routes based on folders structure of your application.
 By default it uses `src` folder as root and you can create your routes just by creating folders and files.
 
 ## Installation:
 ``` npm install effortless-express ```
+
 ## Quick Start
 
 ```javascript
@@ -16,7 +17,7 @@ app.use(effortlessExpress);
 app.listen(2000);
 ```
 
-Now `effortless-express` is looking into your `src`(right now You cannot change this folder name) folder and in order to create a route you have two options:
+Now `effortless-express` is looking into your `src`(right now you cannot change this folder name) folder and in order to create a route you have two options:
 ####1. create a `route.js` file and export http methods:
 For example if I create a folder named `users` and I create a file named `route.js`
 my route will be this : `myBaseURL:myPort/users`
@@ -53,3 +54,6 @@ You can use both of this methods but this packages priority is the first one. Yo
 
 ## People
   The original author of effortless-express is [Poorshad](https://github.com/pshaddel)
+
+## Contributing
+  [Contributing](https://github.com/pshaddel/efforless-express)
