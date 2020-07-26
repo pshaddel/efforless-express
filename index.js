@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
             require(routeMethod)(req, res, next);
         }
         catch{
-            res.status(404).send("simple-express couldn't find your file")
+            res.status(404).send("Not Found")
         }
     }
     next();
