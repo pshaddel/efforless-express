@@ -1,6 +1,6 @@
 {
   "name": "effortless-express",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A way to use express in folder and files structure.",
   "main": "index.js",
   "author": "Poorshad Shaddel",

@@ -17,7 +17,7 @@ app.use(effortlessExpress);
 app.listen(2000);
 ```
 
-Now `effortless-express` is looking into your `src`(right now you cannot change this folder name) folder and in order to create a route you have two options:
+Now `effortless-express` is looking into your `src`(right now you cannot change this folder name) folder and in order to create a route you have a few options:
 ####1. create a `route.js` file and export http methods:
 For example if I create a folder named `users` and I create a file named `route.js`
 my route will be this : `myBaseURL:myPort/users`
@@ -43,6 +43,17 @@ module.exports = (req, res, next)=>{
 
 ####3. combination of 1 and 2 :
 You can use both of this methods but this packages priority is the first one. You can implement few methods in your `route.js` file and you can create other files for methods which are not in your `route.js` file.
+
+####4. Handling requests like this : `baseURL:users/userId`
+We need to handle this kind of requests in our application. In order to get the `userId` in the url mentioned above we can create a file named : `[id].js`(This idea is inspided from NextJS).
+example:
+Inside folder `users` we have to create a file named `[id.js]`:
+last argument is the `id` from url
+```javascript
+module.exports = (req, res, next, id) => {
+  res.send("This is the id from url" + id);
+}
+```
 
 ## Features
 * File base routes which supports nested foldering.
