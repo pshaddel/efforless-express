@@ -1,6 +1,6 @@
 module.exports = (req, res, next) => {
     const method = req.method.toLowerCase();
-    const address = (process.env.baseURL ? process.env.baseURL  + req.originalUrl :  module.parent.path + "/src" + req.originalUrl).toLowerCase();
+    const address = (process.env.baseURL ? process.env.baseURL  + req.originalUrl :  module.parent.path + "/src" + req.originalUrl).toLowerCase().split("?")[0];
     try {
         const singleRoute = (address[address.length -1] == '/') ? address +'route' : address +'/route'
         require(singleRoute)[method](req, res, next);
