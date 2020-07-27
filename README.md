@@ -66,5 +66,8 @@ module.exports = (req, res, next, id) => {
 ## People
   The original author of effortless-express is [Poorshad](https://github.com/pshaddel)
 
+## Code Examples
+  [Examples](https://github.com/pshaddel/effortless-examples/tree/master/effortless-express)
+
 ## Contributing
   [Contributing](https://github.com/pshaddel/efforless-express)
