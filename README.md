@@ -1,4 +1,4 @@
-# Effotless express
+# Effotless Express
 When we use `express` in our nodejs app we need to put our routes in a file which some people name it `app.js` or `server.js` and this simple package solves the problem of handling a lot of routes in `app.js` file. I decided to create an `express middleware` to organize routes based on folders structure of your application.
 By default it uses `src` folder as root and you can create your routes just by creating folders and files.
 
