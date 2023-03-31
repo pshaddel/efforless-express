@@ -2,9 +2,9 @@ name: BUILD_LINT_TEST_PUBLISH
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   build:
