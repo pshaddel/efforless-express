@@ -1,8 +1,8 @@
 {
   "name": "effortless-express",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A way to use express in folder and files structure.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "author": "Poorshad Shaddel",
   "license": "ISC",
   "keywords": [
@@ -10,5 +10,10 @@
     "effortless-express",
     "nodejs",
     "simple express"
-  ]
+  ],
+  "devDependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.0.3"
+  }
 }
