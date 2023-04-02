@@ -5,13 +5,10 @@ import clc from "cli-color";
 
 const methods = ["get", "post", "put", "delete", "patch"] as const;
 type Methods = typeof methods[number];
-function isMethodPatternFileRegex(absolute: string): boolean {
+function isRouteMethod(absolute: string): boolean {
   return /.*\.(get|post|put|delete|patch)\.(js|ts)$/.test(absolute);
 }
-function isEndingWithPatternRegex(
-  str: string,
-  pattern: string = "route"
-): boolean {
+function isRoute(str: string, pattern: string = "route"): boolean {
   return new RegExp(`.*\.${pattern}\.(js|ts)$`).test(str);
 }
 function getFilesRecursively(
@@ -25,7 +22,12 @@ function getFilesRecursively(
     if (fs.statSync(absolute).isDirectory()) {
       getFilesRecursively(absolute, files, baseDir);
     } else {
-      if (isMethodPatternFileRegex(absolute)) {
+      if (isRoute(absolute)) {
+        const fileName = extractFileNameFromPath(absolute);
+        const pathWithoutFileName = absolute.replace(fileName, "");
+        const pathAfterSrc = pathWithoutFileName.split(baseDir)[1];
+        files.push({ absolute, fileName, pathAfterSrc, type: "route" });
+      } else if (isRouteMethod(absolute)) {
         const fileName = extractFileNameFromPath(absolute);
         const pathWithoutFileName = absolute.replace(fileName, "");
         const pathAfterSrc = pathWithoutFileName.split("src")[1];
@@ -38,11 +40,6 @@ function getFilesRecursively(
           type: "file",
           method: method as Methods,
         });
-      } else if (isEndingWithPatternRegex(absolute)) {
-        const fileName = extractFileNameFromPath(absolute);
-        const pathWithoutFileName = absolute.replace(fileName, "");
-        const pathAfterSrc = pathWithoutFileName.split(baseDir)[1];
-        files.push({ absolute, fileName, pathAfterSrc, type: "route" });
       }
     }
   }
@@ -60,6 +57,15 @@ type RouterFileInfo = {
   type?: string;
   method?: Methods;
 };
+
+function getFiles(absolutePathToSrc: string) {
+  const splittedPath = absolutePathToSrc.split("/");
+  const baseDir = splittedPath[splittedPath.length - 1];
+  let files: RouterFileInfo[] = [];
+  getFilesRecursively(absolutePathToSrc, files, baseDir);
+  return files;
+}
+
 export function loadRoutes(
   app: Express,
   absolutePathToSrc: string,
@@ -67,12 +73,12 @@ export function loadRoutes(
     logger?: boolean;
   } = { logger: true }
 ) {
-  const splittedPath = absolutePathToSrc.split("/");
-  const baseDir = splittedPath[splittedPath.length - 1];
-  let files: RouterFileInfo[] = [];
-  getFilesRecursively(absolutePathToSrc, files, baseDir);
+  const files = getFiles(absolutePathToSrc);
 
   const listOfRoutes: [string, string, Methods | "Router"][] = [];
+
+  conflictFinder(files);
+
   files.forEach((file) => {
     const route = require(file.absolute);
     if (typeof route === "function" && Object.getPrototypeOf(route) == Router) {
@@ -105,10 +111,12 @@ export function loadRoutes(
     }
     console.log("Could not load this Route: ", file.absolute);
   });
+
   if (options.logger) {
     routeLogger(listOfRoutes);
   }
 }
+
 function routeLogger(listOfRoutes: [string, string, Methods | "Router"][]) {
   const logArray: string[] = ["List of Routes:\n"];
   listOfRoutes.forEach((route) => {
@@ -137,4 +145,23 @@ function methodColor(method: Methods | "Router") {
     default:
       return "white";
   }
+}
+
+export function conflictFinder(files: RouterFileInfo[]) {
+  const routes = files.filter((file) => file.type === "route");
+  const filesWithMethods = files.filter((file) => file.method);
+  routes.forEach((route) => {
+    filesWithMethods.forEach((file) => {
+      if (route.pathAfterSrc === file.pathAfterSrc) {
+        throw new Error(
+          `Conflict found between these files: \n${clc.red(
+            route.absolute
+          )}\n${clc.yellow(file.absolute)}\nYou cannot have a ${clc.red(
+            "route"
+          )} file and a ${clc.yellow("method route")} in the same directory.
+          `
+        );
+      }
+    });
+  });
 }
