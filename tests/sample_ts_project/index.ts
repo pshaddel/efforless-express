@@ -6,6 +6,6 @@ app.get("/", (req, res) => {
   res.send("ping!");
 });
 
-loadRoutes(app, path.join(__dirname, 'src'));
+loadRoutes(app, path.join(__dirname, "src"));
 
-module.exports = app;
+export default app;
