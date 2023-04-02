@@ -3,6 +3,9 @@
   "version": "1.1.4",
   "description": "A way to use express in folder and files structure.",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "types": "./dist/index.d.ts",
   "scripts": {
     "start:dev": "node -r @swc-node/register lib/index.ts",
