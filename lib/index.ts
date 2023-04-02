@@ -1,11 +1,18 @@
 import fs from "fs";
 import path from "path";
 import { Router, Express } from "express";
+import clc from "cli-color";
 
 const methods = ["get", "post", "put", "delete", "patch"] as const;
-type Methods = typeof methods[number]
+type Methods = typeof methods[number];
 function isMethodPatternFileRegex(absolute: string): boolean {
   return /.*\.(get|post|put|delete|patch)\.(js|ts)$/.test(absolute);
+}
+function isEndingWithPatternRegex(
+  str: string,
+  pattern: string = "route"
+): boolean {
+  return new RegExp(`.*\.${pattern}\.(js|ts)$`).test(str);
 }
 function getFilesRecursively(
   directory: string,
@@ -18,12 +25,7 @@ function getFilesRecursively(
     if (fs.statSync(absolute).isDirectory()) {
       getFilesRecursively(absolute, files, baseDir);
     } else {
-      if (absolute.endsWith("route.js") || absolute.endsWith("route.ts")) {
-        const fileName = extractFileNameFromPath(absolute);
-        const pathWithoutFileName = absolute.replace(fileName, "");
-        const pathAfterSrc = pathWithoutFileName.split(baseDir)[1];
-        files.push({ absolute, fileName, pathAfterSrc, type: "route" });
-      } else if (isMethodPatternFileRegex(absolute)) {
+      if (isMethodPatternFileRegex(absolute)) {
         const fileName = extractFileNameFromPath(absolute);
         const pathWithoutFileName = absolute.replace(fileName, "");
         const pathAfterSrc = pathWithoutFileName.split("src")[1];
@@ -36,6 +38,11 @@ function getFilesRecursively(
           type: "file",
           method: method as Methods,
         });
+      } else if (isEndingWithPatternRegex(absolute)) {
+        const fileName = extractFileNameFromPath(absolute);
+        const pathWithoutFileName = absolute.replace(fileName, "");
+        const pathAfterSrc = pathWithoutFileName.split(baseDir)[1];
+        files.push({ absolute, fileName, pathAfterSrc, type: "route" });
       }
     }
   }
@@ -51,30 +58,33 @@ type RouterFileInfo = {
   fileName: string;
   pathAfterSrc: string;
   type?: string;
-  method?: Methods
+  method?: Methods;
 };
-export function loadRoutes(app: Express, absolutePathToSrc: string) {
+export function loadRoutes(
+  app: Express,
+  absolutePathToSrc: string,
+  options: {
+    logger?: boolean;
+  } = { logger: true }
+) {
   const splittedPath = absolutePathToSrc.split("/");
   const baseDir = splittedPath[splittedPath.length - 1];
   let files: RouterFileInfo[] = [];
   getFilesRecursively(absolutePathToSrc, files, baseDir);
 
-  const listOfRoutes: [string, string][] = [];
+  const listOfRoutes: [string, string, Methods | "Router"][] = [];
   files.forEach((file) => {
     const route = require(file.absolute);
-    if (
-      typeof route === "function" &&
-      Object.getPrototypeOf(route) == Router
-    ) {
+    if (typeof route === "function" && Object.getPrototypeOf(route) == Router) {
       app.use(file.pathAfterSrc, route);
-      listOfRoutes.push(["Router", `${file.pathAfterSrc}`]);
+      listOfRoutes.push(["Router", `${file.pathAfterSrc}`, "Router"]);
       return;
     }
     if (typeof route === "function" && file.method) {
       app[file.method](file.pathAfterSrc, route);
       const methodSymbol =
         file.method.toUpperCase() + " ".repeat(6 - file.method.length);
-      listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`]);
+      listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`, file.method]);
       return;
     }
     if (typeof route === "object") {
@@ -83,31 +93,48 @@ export function loadRoutes(app: Express, absolutePathToSrc: string) {
           app[method](file.pathAfterSrc, route[method]);
           const methodSymbol =
             method.toUpperCase() + " ".repeat(6 - method.length);
-          listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`]);
+          listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`, method]);
         }
       });
       return;
     }
     if (typeof route === "function") {
       app.use(file.pathAfterSrc, route);
-      listOfRoutes.push(["Router", `${file.pathAfterSrc}`]);
+      listOfRoutes.push(["Router", `${file.pathAfterSrc}`, "Router"]);
       return;
     }
-    console.log('here:', typeof route, file.absolute, 'is not a valid route file')
+    console.log("Could not load this Route: ", file.absolute);
   });
+  if (options.logger) {
+    routeLogger(listOfRoutes);
+  }
+}
+function routeLogger(listOfRoutes: [string, string, Methods | "Router"][]) {
+  const logArray: string[] = ["List of Routes:\n"];
   listOfRoutes.forEach((route) => {
-    const method = route[0];
+    const color = methodColor(route[2]);
+    const method = clc[color](route[0]);
     const path = route[1];
-    if (method.indexOf("GET") > -1) {
-      console.log("\x1b[32m%s\x1b[0m", method, path);
-    } else if (method.indexOf("POST") > -1) {
-      console.log("\x1b[33m%s\x1b[0m", method, path);
-    } else if (method.indexOf("DELETE") > -1) {
-      console.log("\x1b[31m%s\x1b[0m", method, path);
-    } else if (method.indexOf("PATCH") > -1 || method.indexOf("PUT") > -1) {
-      console.log("\x1b[35m%s\x1b[0m", method, path);
-    } else {
-      console.log(method, path);
-    }
+    logArray.push(method, path, "\n");
   });
-};
+  console.log(...logArray);
+}
+
+function methodColor(method: Methods | "Router") {
+  switch (method) {
+    case "get":
+      return "green";
+    case "post":
+      return "yellow";
+    case "delete":
+      return "red";
+    case "patch":
+      return "magenta";
+    case "put":
+      return "magenta";
+    case "Router":
+      return "cyan";
+    default:
+      return "white";
+  }
+}
