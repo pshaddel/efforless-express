@@ -1,9 +1,15 @@
 {
-    "roots": ["<rootDir>/tests"],
-    "transform": {
-      "^.+\\.tsx?$": "@swc/jest"
-    },
-    "testRegex": "(.*|(\\.|/)(test|spec))\\.tsx?$",
-    "moduleFileExtensions": ["ts", "json", "js", "node"]
-  }
-  
+  "roots": ["<rootDir>/tests"],
+  "transform": {
+    "^.+\\.tsx?$": "@swc/jest"
+  },
+  "modulePathIgnorePatterns": [
+    "node_modules",
+    "dist",
+    "coverage",
+    ".github",
+    ".vscode"
+  ],
+  "testMatch": ["**/tests/**/*.test.ts"],
+  "moduleFileExtensions": ["ts", "json", "js", "node"]
+}
