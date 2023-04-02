@@ -1,3 +1,3 @@
 module.exports = (req, res) => {
-  res.json({ message: "Payments Router" });
+  res.json({ message: "Payments Router - GET Method" });
 };

@@ -1,3 +1,3 @@
 module.exports = function (req, res) {
-  res.json({ message: "Payments Router DELETE" });
+  res.json({ message: "Payments Router - DELETE Method" });
 };

@@ -4,21 +4,15 @@ const express = require("express");
 
 const methods = ["get", "post", "put", "delete", "patch"];
 
-function isMethodPatternFile(absolute) {
-  return (
-    absolute.endsWith("get.js") ||
-    absolute.endsWith("get.ts") ||
-    absolute.endsWith("post.js") ||
-    absolute.endsWith("post.ts") ||
-    absolute.endsWith("put.js") ||
-    absolute.endsWith("put.ts") ||
-    absolute.endsWith("delete.js") ||
-    absolute.endsWith("delete.ts") ||
-    absolute.endsWith("patch.js") ||
-    absolute.endsWith("patch.ts")
-  );
+// use a regex to rewrite isMethodPatternFile
+function isMethodPatternFileRegex(absolute: string): boolean {
+  return /.*\.(get|post|put|delete|patch)\.(js|ts)$/.test(absolute);
 }
-function getFilesRecursively(directory, files, baseDir) {
+function getFilesRecursively(
+  directory: string,
+  files: RouterFileInfo[],
+  baseDir: string
+) {
   const filesInDirectory = fs.readdirSync(directory);
   for (const file of filesInDirectory) {
     const absolute = path.join(directory, file);
@@ -30,7 +24,7 @@ function getFilesRecursively(directory, files, baseDir) {
         const pathWithoutFileName = absolute.replace(fileName, "");
         const pathAfterSrc = pathWithoutFileName.split(baseDir)[1];
         files.push({ absolute, fileName, pathAfterSrc, type: "route" });
-      } else if (isMethodPatternFile(absolute)) {
+      } else if (isMethodPatternFileRegex(absolute)) {
         const fileName = extractFileNameFromPath(absolute);
         const pathWithoutFileName = absolute.replace(fileName, "");
         const pathAfterSrc = pathWithoutFileName.split("src")[1];
@@ -49,18 +43,24 @@ function getFilesRecursively(directory, files, baseDir) {
   return files;
 }
 
-function extractFileNameFromPath(filePath) {
+function extractFileNameFromPath(filePath: string): string {
   const fileName = filePath.split("/").pop();
-  return fileName;
+  return fileName as string;
 }
-
-module.exports.loadRoutes = function (app, absolutePathToSrc) {
+type RouterFileInfo = {
+  absolute: string;
+  fileName: string;
+  pathAfterSrc: string;
+  type?: string;
+  method?: string;
+};
+export function loadRoutes(app: any, absolutePathToSrc: string) {
   const splittedPath = absolutePathToSrc.split("/");
   const baseDir = splittedPath[splittedPath.length - 1];
-  let files = [];
+  let files: RouterFileInfo[] = [];
   getFilesRecursively(absolutePathToSrc, files, baseDir);
 
-  const listOfRoutes = [];
+  const listOfRoutes: [string, string][] = [];
   files.forEach((file) => {
     const route = require(file.absolute);
     if (
@@ -69,7 +69,6 @@ module.exports.loadRoutes = function (app, absolutePathToSrc) {
     ) {
       app.use(file.pathAfterSrc, route);
       listOfRoutes.push(["Router", `${file.pathAfterSrc}`]);
-      // console.log(`Router ${file.pathAfterSrc}`);
       return;
     }
     if (typeof route === "function" && file.method) {
@@ -77,7 +76,6 @@ module.exports.loadRoutes = function (app, absolutePathToSrc) {
       const methodSymbol =
         file.method.toUpperCase() + " ".repeat(6 - file.method.length);
       listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`]);
-      // console.log(`${methodSymbol} ${file.pathAfterSrc}`);
       return;
     }
     if (typeof route === "object") {
@@ -87,10 +85,16 @@ module.exports.loadRoutes = function (app, absolutePathToSrc) {
           const methodSymbol =
             method.toUpperCase() + " ".repeat(6 - method.length);
           listOfRoutes.push([methodSymbol, `${file.pathAfterSrc}`]);
-          // console.log(`${methodSymbol} ${file.pathAfterSrc}`);
         }
       });
+      return;
     }
+    if (typeof route === "function") {
+      app.use(file.pathAfterSrc, route);
+      listOfRoutes.push(["Router", `${file.pathAfterSrc}`]);
+      return;
+    }
+    console.log('here:', typeof route, file.absolute, 'is not a valid route file')
   });
   listOfRoutes.forEach((route) => {
     const method = route[0];
@@ -108,3 +112,5 @@ module.exports.loadRoutes = function (app, absolutePathToSrc) {
     }
   });
 };
+
+console.log("Loading routes...");
