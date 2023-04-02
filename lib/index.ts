@@ -147,7 +147,7 @@ function methodColor(method: Methods | "Router") {
   }
 }
 
-export function conflictFinder(files: RouterFileInfo[]) {
+function conflictFinder(files: RouterFileInfo[]) {
   const routes = files.filter((file) => file.type === "route");
   const filesWithMethods = files.filter((file) => file.method);
   routes.forEach((route) => {
@@ -164,4 +164,8 @@ export function conflictFinder(files: RouterFileInfo[]) {
       }
     });
   });
+}
+
+if (process.env.NODE_ENV === "test") {
+  module.exports.conflictFinder = conflictFinder;
 }

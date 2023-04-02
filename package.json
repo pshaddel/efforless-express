@@ -1,12 +1,12 @@
 {
   "name": "effortless-express",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A way to use express in folder and files structure.",
-  "main": "dist/index.js",
+  "main": "dist/lib/index.js",
   "files": [
     "dist"
   ],
-  "types": "./dist/index.d.ts",
+  "types": "./dist/lib/index.d.ts",
   "scripts": {
     "start:dev": "node -r @swc-node/register lib/index.ts",
     "build": "tsc",
