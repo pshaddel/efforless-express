@@ -44,11 +44,15 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org
-      - name: Release
-        uses: justincy/github-action-npm-release@2.0.1
-        id: release
-      - name: publish
-        if: ${{ steps.release.outputs.released == 'true' }}
-        run: npm install && npm run build && npm publish --access public
+      # - name: Release
+      # uses: justincy/github-action-npm-release@2.0.1
+      # id: release
+      # - name: publish
+      #   if: ${{ steps.release.outputs.released == 'true' }}
+      #   run: npm install && npm run build && npm publish --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+      - uses: mikeal/merge-release@master
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
