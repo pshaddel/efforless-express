@@ -1,10 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const express = require("express");
+import fs from "fs";
+import path from "path";
+import { Router, Express } from "express";
 
-const methods = ["get", "post", "put", "delete", "patch"];
-
-// use a regex to rewrite isMethodPatternFile
+const methods = ["get", "post", "put", "delete", "patch"] as const;
+type Methods = typeof methods[number]
 function isMethodPatternFileRegex(absolute: string): boolean {
   return /.*\.(get|post|put|delete|patch)\.(js|ts)$/.test(absolute);
 }
@@ -35,7 +34,7 @@ function getFilesRecursively(
           fileName,
           pathAfterSrc,
           type: "file",
-          method,
+          method: method as Methods,
         });
       }
     }
@@ -52,9 +51,9 @@ type RouterFileInfo = {
   fileName: string;
   pathAfterSrc: string;
   type?: string;
-  method?: string;
+  method?: Methods
 };
-export function loadRoutes(app: any, absolutePathToSrc: string) {
+export function loadRoutes(app: Express, absolutePathToSrc: string) {
   const splittedPath = absolutePathToSrc.split("/");
   const baseDir = splittedPath[splittedPath.length - 1];
   let files: RouterFileInfo[] = [];
@@ -65,7 +64,7 @@ export function loadRoutes(app: any, absolutePathToSrc: string) {
     const route = require(file.absolute);
     if (
       typeof route === "function" &&
-      Object.getPrototypeOf(route) == express.Router
+      Object.getPrototypeOf(route) == Router
     ) {
       app.use(file.pathAfterSrc, route);
       listOfRoutes.push(["Router", `${file.pathAfterSrc}`]);
@@ -112,5 +111,3 @@ export function loadRoutes(app: any, absolutePathToSrc: string) {
     }
   });
 };
-
-console.log("Loading routes...");
