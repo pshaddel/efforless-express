@@ -4,6 +4,11 @@ Use you your folder structure to create your routes!
 
 By using some simple patterns you are able to build your api without a messy big Express App file.
 
+This file structure leads to these API's:
+
+<img width="796" alt="Screenshot 2023-04-02 at 3 50 48 PM" src="https://user-images.githubusercontent.com/43247296/229357200-33fb1de2-16aa-473d-b625-4c2bb63be471.png">
+
+
 ## Installation:
 
 ```bash
@@ -15,9 +20,9 @@ npm install effortless-express
 ```javascript
 const express = require("express");
 const app = express();
-const { loadRoutes } = require("effortless-express");
+const { load } = require("effortless-express");
 
-loadRoutes(app, path.join(__dirname, "src")); // if the files are in src folder
+load(app, path.join(__dirname, "./source_files"));
 
 app.listen(2000);
 ```
@@ -36,20 +41,6 @@ module.exports.get = (req, res, next) => {
 };
 ```
 
-####2. create `route.[http method].js`: In this way you can implement your http methods in separate files:
-For example I can create a folder named `places` and I create a file named `route.get.js`
-my route will be this : `myBaseURL:myPort/places`
-And in order to handle requests all I need is exporting a function from this file
-`route.get.js`
-
-```javascript
-module.exports = (req, res, next) => {
-  res.send("getting places...");
-};
-```
-
-####3. combination of 1 and 2 :
-You can use both of this methods but this packages priority is the first one. You can implement few methods in your `route.js` file and you can create other files for methods which are not in your `route.js` file.
 
 ## Features
 
