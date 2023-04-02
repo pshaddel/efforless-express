@@ -1,5 +1,4 @@
-import { conflictFinder } from "../lib";
-
+import { conflictFinder } from "../lib/conflict_finder";
 describe("Conflict Finder", () => {
   it("should return an error when we have both a route file and a route method file in the same directory", () => {
     try {
