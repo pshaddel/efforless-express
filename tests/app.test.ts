@@ -66,4 +66,13 @@ describe("sample_project", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: "Weather Router - GET Method" });
   });
+
+  it("should be able to get separated methods exported from a route file", async () => {
+    const response = await request(app).get("/shop/");
+    const postResponse = await request(app).post("/shop/");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ message: "Shop Route GET" });
+    expect(postResponse.status).toBe(200);
+    expect(postResponse.body).toEqual({ message: "Shop Route POST" });
+  });
 });
