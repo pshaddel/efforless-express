@@ -3,7 +3,7 @@ import { getFiles, Methods, methods } from "./get_files";
 import { conflictFinder } from "./conflict_finder";
 import { routeLogger } from "./route_logger";
 
-export function loadRoutes(
+export function load(
   /**
    * Express app
    */
