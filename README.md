@@ -1,13 +1,12 @@
 # Effotless Express
 
-Use you your folder structure to create your routes!
+Use you your folder structure to create your routes!(Both <b>Typescript</b> and <b>Javascript</b> files)
 
 By using some simple patterns you are able to build your api without a messy big Express App file.
 
 This file structure leads to these API's:
 
 <img width="796" alt="Screenshot 2023-04-02 at 3 50 48 PM" src="https://user-images.githubusercontent.com/43247296/229357200-33fb1de2-16aa-473d-b625-4c2bb63be471.png">
-
 
 ## Installation:
 
@@ -18,8 +17,7 @@ npm install effortless-express
 ## Quick Start
 
 ```javascript
-const express = require("express");
-const app = express();
+const app = require("express")();
 const { load } = require("effortless-express");
 
 load(app, path.join(__dirname, "./source_files"));
@@ -27,30 +25,49 @@ load(app, path.join(__dirname, "./source_files"));
 app.listen(2000);
 ```
 
-Now `effortless-express` is looking into your `src`(right now you cannot change this folder name) folder and in order to create a route you have a few options:
-####1. create a `route.js` file and export http methods:
-For example if I create a folder named `users` and I create a file named `route.js`
-my route will be this : `myBaseURL:myPort/users`
-If I want to handle requests with `get` method all I need to do is implementing `get` method inside `route.js`
+### Add a Route(Express Router)
 
-`route.js:`
+Create a file that has `route` before file extension(Examples: `route.js`, `route.ts`, `myRoute.route.ts` and this is the pattern that we check `.*\.${pattern}\.(js|ts)$`) in its file name.
 
-```javascript
-module.exports.get = (req, res, next) => {
-  res.send("get method implemented!");
+Now you have three options:
+
+- You can export a `Express Router`
+  ```typescript
+  const express = require("express");
+  const router = express.Router();
+  router.get("/", (req, res) =>
+    res.json({ message: "Customers Router - GET Method" })
+  );
+  module.exports = router;
+  ```
+- Directly export a function that handles the requets:
+  ```typescript
+  module.exports = (req, res) => {
+    res.json({ message: "Health Check Route" });
+  };
+  ```
+- Or export specific methods you have implemented:
+  ```typescript
+  const get = (req, res) => res.json({ message: "Shop Route GET" });
+  const post = (req, res) => res.json({ message: "Shop Route POST" });
+  module.exports = { get, post };
+  ```
+
+### Add a Method Router
+
+Use the http methods before file extensions(Examples: `users.get.ts`, `post.js`, `customers.put.ts` and this is the pattern we use: `/.*\.(get|post|put|delete|patch)\.(js|ts)$/`).
+
+Simply export the function from the file:
+
+```typescript
+module.exports = function (req, res) {
+  res.json({ message: "Payments Router" });
 };
 ```
 
-
-## Features
-
-- File base routes which supports nested foldering.
-- Routes separated by methods(`route.get.js, route.post.js, route.put.js, ...`)
-- Make your `app.js` or `server.js` clean by using folder based routes.
-
 ## Philosophy
 
-effortles-express philosophy is to provide a simple and clean structure for express projects by using folder base routes. In this way you can remove your routes from `app.js` and by creating folders and files you can create your desired routes. Also instead it helps you keep your files small by suggesting using second way(`route.get.js, route.post.js`)
+effortles-express philosophy is to provide a simple and clean structure for express projects by using folder base routes. In this way you can remove your routes from `app.js|ts` and by creating folders and files you can create your desired routes. Also it helps you keep your files small by suggesting using second way(`yourFileName.get.ts`)
 
 ## People
 
@@ -61,5 +78,7 @@ The original author of effortless-express is [Poorshad](https://github.com/pshad
 [Examples](https://github.com/pshaddel/effortless-examples/tree/master/effortless-express)
 
 ## Contributing
+
+If you needed a change feel free to open an issue or even make a pull request!
 
 [Contributing](https://github.com/pshaddel/efforless-express)
