@@ -19,8 +19,10 @@ export function load(
      * @default true
      */
     logger?: boolean;
-  } = { logger: true }
+    loadTime?: boolean
+  } = { logger: true, loadTime: true }
 ) {
+  const start = Date.now();
   const files = getFiles(absolutePathToSrc);
 
   const listOfRoutes: [string, string, Methods | "Router"][] = [];
@@ -63,4 +65,8 @@ export function load(
   if (options.logger) {
     routeLogger(listOfRoutes);
   }
+  if (options.loadTime) {
+    console.log(`load time: ${Date.now() - start}ms`);
+  }
+
 }
